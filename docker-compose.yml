@@ -1,0 +1,48 @@
+### docker-compose.yml
+
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: taskdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  server:
+    build: ./server
+    container_name: node_server
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    environment:
+      DATABASE_URL: postgres://admin:password@db:5432/taskdb
+      JWT_SECRET: "Ravish_Secret"
+      NODE_ENV: development
+
+  client:
+    build: ./client
+    container_name: react_client
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:
