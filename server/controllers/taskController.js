@@ -32,7 +32,6 @@ exports.getTasks = async (req, res) => {
     if (priority) where.priority = priority;
     if (dueDate) where.dueDate = { [Op.gte]: new Date(dueDate) };
 
-    // **Authorization Logic**: Admins see all tasks, users only see tasks assigned to them.
     if (req.user.role !== 'admin') {
       where.assignedTo = req.user.id;
     }
@@ -63,7 +62,6 @@ exports.getTaskById = async (req, res) => {
         });
         if (!task) return res.status(404).json({ message: 'Task not found' });
 
-        // Authorization check
         if (req.user.role !== 'admin' && task.assignedTo !== req.user.id) {
             return res.status(403).json({ message: 'User not authorized' });
         }
@@ -78,7 +76,6 @@ exports.updateTask = async (req, res) => {
         const task = await Task.findByPk(req.params.id);
         if (!task) return res.status(404).json({ message: 'Task not found' });
 
-        // Authorization check
         if (req.user.role !== 'admin' && task.assignedTo !== req.user.id) {
             return res.status(403).json({ message: 'User not authorized' });
         }
@@ -94,7 +91,6 @@ exports.deleteTask = async (req, res) => {
         const task = await Task.findByPk(req.params.id);
         if (!task) return res.status(404).json({ message: 'Task not found' });
 
-        // Authorization check (Only admin can delete)
         if (req.user.role !== 'admin') {
             return res.status(403).json({ message: 'User not authorized' });
         }

@@ -1,18 +1,15 @@
-### server/config/database.js
-
+// ... at the top of the file
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-// Create a new Sequelize instance, connecting to our PostgreSQL database
+const isProduction = process.env.NODE_ENV === 'production';
+
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
-  logging: false, // Set to console.log to see the raw SQL queries
+  logging: false,
   dialectOptions: {
-    // Required for Render deployment, but good practice for development
-    ssl: {
-      require: true,
-      rejectUnauthorized: false
-    }
+    // Only require SSL in production (like on Render)
+    ssl: isProduction ? { require: true, rejectUnauthorized: false } : false
   }
 });
 

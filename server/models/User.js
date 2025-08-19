@@ -1,4 +1,4 @@
-### server/models/User.js
+
 
 const { DataTypes } = require('sequelize');
 const bcrypt = require('bcryptjs');
