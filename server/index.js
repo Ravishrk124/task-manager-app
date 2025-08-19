@@ -4,6 +4,11 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
+
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./swagger.yaml');
+
 const { connectDB, sequelize } = require('./config/database');
 const app = express();
 const authRoutes = require('./routes/authRoutes');
@@ -18,6 +23,8 @@ connectDB(); // Connect to the database
 sequelize.sync().then(() => { // Sync all defined models to the DB
   console.log('Database synced');
 });
+// ADD THIS LINE TO SERVE THE SWAGGER DOCS
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Serve uploaded files statically from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
