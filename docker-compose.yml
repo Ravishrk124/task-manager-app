@@ -31,7 +31,7 @@ services:
       - /app/node_modules
     environment:
       DATABASE_URL: postgres://admin:password@db:5432/taskdb
-      JWT_SECRET: "Ravish_Secret"
+      JWT_SECRET: "YOUR_ULTRA_SECRET_KEY_HERE"
       NODE_ENV: development
 
   client:

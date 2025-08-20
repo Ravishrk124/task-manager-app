@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -23,9 +21,21 @@ function Header() {
           <Link to="/">Task Manager</Link>
         </div>
         <nav>
-          <ul className="flex items-center space-x-4">
+          <ul className="flex items-center space-x-6">
             {user ? (
               <>
+                {/* Admin-only link */}
+                {user.role === 'admin' && (
+                  <li>
+                    <Link
+                      to="/admin/users"
+                      className="text-gray-600 hover:text-blue-600 font-semibold"
+                    >
+                      Manage Users
+                    </Link>
+                  </li>
+                )}
+
                 <li className="font-semibold">Hello, {user.email}</li>
                 <li>
                   <button
@@ -39,7 +49,10 @@ function Header() {
             ) : (
               <>
                 <li>
-                  <Link to="/login" className="text-gray-600 hover:text-blue-600 font-semibold">
+                  <Link
+                    to="/login"
+                    className="text-gray-600 hover:text-blue-600 font-semibold"
+                  >
                     Login
                   </Link>
                 </li>

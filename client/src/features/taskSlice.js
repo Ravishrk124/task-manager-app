@@ -1,4 +1,3 @@
-
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import apiService from '../api/apiService';
 
@@ -10,17 +9,20 @@ const initialState = {
   message: '',
 };
 
-// Create new task
+// ✅ Create new task (with FormData support)
 export const createTask = createAsyncThunk('tasks/create', async (taskData, thunkAPI) => {
   try {
-    return await apiService.post('/tasks', taskData);
+    const response = await apiService.post('/tasks', taskData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
   } catch (error) {
     const message = error.response?.data?.message || error.message || 'Unable to create task';
     return thunkAPI.rejectWithValue(message);
   }
 });
 
-// Get user tasks
+// ✅ Get all tasks
 export const getTasks = createAsyncThunk('tasks/getAll', async (_, thunkAPI) => {
   try {
     const response = await apiService.get('/tasks');
@@ -31,13 +33,26 @@ export const getTasks = createAsyncThunk('tasks/getAll', async (_, thunkAPI) => 
   }
 });
 
-// Delete user task
+// ✅ Delete task
 export const deleteTask = createAsyncThunk('tasks/delete', async (id, thunkAPI) => {
   try {
     await apiService.delete(`/tasks/${id}`);
     return id;
   } catch (error) {
     const message = error.response?.data?.message || error.message || 'Unable to delete task';
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+// ✅ Update task (new)
+export const updateTask = createAsyncThunk('tasks/update', async (taskData, thunkAPI) => {
+  try {
+    const response = await apiService.put(`/tasks/${taskData.id}`, taskData.data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || error.message || 'Unable to update task';
     return thunkAPI.rejectWithValue(message);
   }
 });
@@ -50,19 +65,22 @@ export const taskSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // 📌 Create
       .addCase(createTask.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(createTask.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.tasks.push(action.payload.data);
+        state.tasks.push(action.payload);
       })
       .addCase(createTask.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
       })
+
+      // 📌 Get all
       .addCase(getTasks.pending, (state) => {
         state.isLoading = true;
       })
@@ -76,6 +94,8 @@ export const taskSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
       })
+
+      // 📌 Delete
       .addCase(deleteTask.pending, (state) => {
         state.isLoading = true;
       })
@@ -85,6 +105,23 @@ export const taskSlice = createSlice({
         state.tasks = state.tasks.filter((task) => task.id !== action.payload);
       })
       .addCase(deleteTask.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+
+      // 📌 Update
+      .addCase(updateTask.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateTask.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.tasks = state.tasks.map((task) =>
+          task.id === action.payload.id ? action.payload : task
+        );
+      })
+      .addCase(updateTask.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;

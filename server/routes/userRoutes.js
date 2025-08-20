@@ -1,16 +1,17 @@
-
-
 const express = require('express');
 const router = express.Router();
-const { getUsers, deleteUser } = require('../controllers/userController');
+const { getUsers, deleteUser, createUser, updateUser, getUsersForAssignment } = require('../controllers/userController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
-// This route is protected and can only be accessed by admins
 router.route('/')
-  .get(protect, admin, getUsers);
+    .get(protect, admin, getUsers)
+    .post(protect, admin, createUser);
 
-// This route is also protected and admin-only
+// Add this new route for the assignment list
+router.get('/list', protect, admin, getUsersForAssignment);
+
 router.route('/:id')
-  .delete(protect, admin, deleteUser);
+    .delete(protect, admin, deleteUser)
+    .put(protect, admin, updateUser);
 
 module.exports = router;
