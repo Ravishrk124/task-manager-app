@@ -3,8 +3,6 @@
 A robust, full-stack **Task Management Application** built with **React, Node.js, Express, and PostgreSQL**.  
 The application is fully containerized with Docker for simple setup and deployment.
 
-![App Screenshot](./screenshot.png)  
-*(Replace with an actual screenshot of your running app)*
 
 ---
 
